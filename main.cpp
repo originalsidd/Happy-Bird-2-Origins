@@ -1,9 +1,7 @@
-#include <iostream>
 #include "Game.hpp"
+#include "DEFINITIONS.hpp"
 
 int main()
 {
-    Cosmic::Game(800, 600, "SFML Starter");
-    
-    return EXIT_SUCCESS;
+    Cosmic::Game(SCREEN_WIDTH, SCREEN_HEIGHT, "Flappy Bird");
 }
