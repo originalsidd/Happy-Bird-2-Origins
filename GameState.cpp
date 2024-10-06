@@ -2,17 +2,40 @@
 #include "GameState.hpp"
 #include "DEFINITIONS.hpp"
 #include "GameOverState.hpp"
+#include "GameFinishState.hpp"
+
+#include <iostream>
 
 namespace Cosmic
 {
     GameState::GameState(GameDataRef data) : _data(data)
     {
-        
+        _isNight = false;
     }
 
     void GameState::Init()
     {
+        if (!_hitSoundBuffer.loadFromFile(HIT_SOUND_FILEPATH))
+        {
+            std::cout << "Error loading Hit Sound Effect" << std::endl;
+        }
+        
+        if (!_wingSoundBuffer.loadFromFile(WING_SOUND_FILEPATH))
+        {
+            std::cout << "Error loading Wing Sound Effect" << std::endl;
+        }
+        
+        if (!_pointSoundBuffer.loadFromFile(POINT_SOUND_FILEPATH))
+        {
+            std::cout << "Error loading Point Sound Effect" << std::endl;
+        }
+        
+        _hitSound.setBuffer(_hitSoundBuffer);
+        _wingSound.setBuffer(_wingSoundBuffer);
+        _pointSound.setBuffer(_pointSoundBuffer);
+        
         _data->assets.LoadTexture("Game Background", GAME_BACKGROUND_FILEPATH);
+        _data->assets.LoadTexture("Game Background 2", GAME_BACKGROUND2_FILEPATH);
         _data->assets.LoadTexture("Pipe Up", PIPE_UP_FILEPATH);
         _data->assets.LoadTexture("Pipe Down", PIPE_DOWN_FILEPATH);
         _data->assets.LoadTexture("Land", LAND_FILEPATH);
@@ -49,12 +72,15 @@ namespace Cosmic
                 _data->window.close();
             }
             
-            if (_data->input.isSpriteClicked(_background, sf::Mouse::Left, _data->window))
+            if (_data->input.isSpriteClicked(_background, sf::Mouse::Left, _data->window)
+                || _data->input.isSpriteClicked(sf::Keyboard::Space))
             {
                 if (GameStates::eGameOver != _gameState)
                 {
                     _gameState = GameStates::ePlaying;
                     bird->Tap();
+                    
+                    _wingSound.play();
                 }
             }
         }
@@ -76,10 +102,15 @@ namespace Cosmic
             {
                 pipe->RandomisePipeOffset();
                 
-                pipe->SpawnBottomPipe();
-                pipe->SpawnTopPipe();
-                pipe->SpawnScoringPipe();
+                int rand1 = rand(), rand2 = rand();
                 
+                if (rand1 % 13) {
+                    pipe->SpawnBottomPipe();
+                }
+                if (rand2 % 13) {
+                    pipe->SpawnTopPipe();
+                }
+                pipe->SpawnScoringPipe();
                 _clock.restart();
             }
             bird->Update(dt);
@@ -93,6 +124,8 @@ namespace Cosmic
                     _gameState = GameStates::eGameOver;
                     
                     _clock.restart();
+                    
+                    _hitSound.play();
                 }
             }
             
@@ -100,11 +133,19 @@ namespace Cosmic
             
             for (int i = 0; i < pipeSprites.size(); i++)
             {
+                if (_score == WIN_SCORE) {
+                    _gameState = GameStates::eGameOver;
+                    
+                    _clock.restart();
+                }
+                
                 if (collision.checkSpriteCollision(bird->GetSprite(), 0.625f, pipeSprites.at(i), 1.0f))
                 {
                     _gameState = GameStates::eGameOver;
                     
                     _clock.restart();
+                    
+                    _hitSound.play();
                 }
             }
             
@@ -114,13 +155,19 @@ namespace Cosmic
                 
                 for (int i = 0; i < scoringSprites.size(); i++)
                 {
-                    if (collision.checkSpriteCollision(bird->GetSprite(), 0.625f, scoringSprites.at(i), 1.0f))
+                    if (collision.checkSpriteCollision(bird->GetSprite(), 0.1f, scoringSprites.at(i), 1.0f))
                     {
                         _score++;
                         
                         hud->UpdateScore(_score);
                         
                         scoringSprites.erase(scoringSprites.begin() + i);
+                        
+                        _pointSound.play();
+                        
+                        if (_score % 20 == 0) {
+                            toggleScenary();
+                        }
                     }
                 }
             }
@@ -132,7 +179,11 @@ namespace Cosmic
             
             if (_clock.getElapsedTime().asSeconds() > TIME_BEFORE_GAME_OVER_APPEARS)
             {
-                _data->machine.AddState(StateRef(new GameOverState(_data, _score)), true);
+                if (_score == WIN_SCORE) {
+                    _data->machine.AddState(StateRef(new GameFinishState(_data, _score)), true);
+                } else {
+                    _data->machine.AddState(StateRef(new GameOverState(_data, _score)), true);
+                }
             }
         }
     }
@@ -152,5 +203,15 @@ namespace Cosmic
         hud->Draw();
         
         _data->window.display();
+    }
+
+    void GameState::toggleScenary() {
+        if (!_isNight) {
+            _background.setTexture(_data->assets.GetTexture("Game Background 2"));
+            _isNight = true;
+        } else {
+            _background.setTexture(_data->assets.GetTexture("Game Background"));
+            _isNight = false;
+        }
     }
 }

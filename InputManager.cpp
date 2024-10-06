@@ -1,4 +1,5 @@
 #include "InputManager.hpp"
+#include <iostream>
 
 namespace Cosmic
 {
@@ -14,6 +15,11 @@ namespace Cosmic
             }
         }
         return false;
+    }
+
+    bool InputManager::isSpriteClicked(sf::Keyboard::Key key)
+    {
+        return sf::Keyboard::isKeyPressed(key);
     }
 
     sf::Vector2i InputManager::GetMousePosition(sf::RenderWindow &window)

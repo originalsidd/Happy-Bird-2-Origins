@@ -37,7 +37,8 @@ namespace Cosmic
                 _data->window.close();
             }
             
-            if (_data->input.isSpriteClicked(_playButton, sf::Mouse::Left, _data->window))
+            if (_data->input.isSpriteClicked(_playButton, sf::Mouse::Left, _data->window)
+                || _data->input.isSpriteClicked(sf::Keyboard::Space))
             {
                 _data->machine.AddState(StateRef(new GameState(_data)), true);
             }

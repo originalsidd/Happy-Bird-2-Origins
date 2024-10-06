@@ -6,6 +6,7 @@
 #include "StateMachine.hpp"
 #include "AssetManager.hpp"
 #include "InputManager.hpp"
+#include "DEFINITIONS.hpp"
 
 namespace Cosmic
 {
@@ -25,7 +26,7 @@ namespace Cosmic
         Game(int width, int height, std::string title);
         
     private:
-        const float dt = 1.0f / 10.0f;
+        const float dt = 1.0f / GAME_FRAME_RATE;
         sf::Clock _clock;
         
         GameDataRef _data = std::make_shared<GameData>();

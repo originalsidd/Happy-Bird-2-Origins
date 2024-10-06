@@ -17,7 +17,7 @@ namespace Cosmic
         void Update(float dt);
         void Draw(float dt);
         
-    private:
+    protected:
         GameDataRef _data;
         
         sf::Sprite _background;
@@ -25,6 +25,7 @@ namespace Cosmic
         sf::Sprite _gameOverContainer;
         sf::Sprite _gameOverTitle;
         sf::Sprite _retryButton;
+        sf::Sprite _medal;
         
         sf::Text _scoreText;
         sf::Text _highScoreText;
