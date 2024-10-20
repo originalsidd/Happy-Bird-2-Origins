@@ -45,6 +45,7 @@
 #define HIT_SOUND_FILEPATH "Resources/audio/Hit.wav"
 #define POINT_SOUND_FILEPATH "Resources/audio/Point.wav"
 #define WING_SOUND_FILEPATH "Resources/audio/Wing.wav"
+#define OST_SOUND_FILEPATH "Resources/audio/OST.wav"
 
 #define SCORE_SAVE_FILEPATH "Resources/HighScore.txt"
 

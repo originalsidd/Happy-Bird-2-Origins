@@ -49,9 +49,11 @@ namespace Cosmic
         sf::SoundBuffer _hitSoundBuffer;
         sf::SoundBuffer _wingSoundBuffer;
         sf::SoundBuffer _pointSoundBuffer;
+        sf::SoundBuffer _ostSoundBuffer;
         
         sf::Sound _hitSound;
         sf::Sound _wingSound;
         sf::Sound _pointSound;
+        sf::Sound _ostSound;
     };
 }

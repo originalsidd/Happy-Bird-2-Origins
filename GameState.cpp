@@ -30,9 +30,15 @@ namespace Cosmic
             std::cout << "Error loading Point Sound Effect" << std::endl;
         }
         
+        if (!_ostSoundBuffer.loadFromFile(OST_SOUND_FILEPATH))
+        {
+            std::cout << "Error loading Point Sound Effect" << std::endl;
+        }
+        
         _hitSound.setBuffer(_hitSoundBuffer);
         _wingSound.setBuffer(_wingSoundBuffer);
         _pointSound.setBuffer(_pointSoundBuffer);
+        _ostSound.setBuffer(_ostSoundBuffer);
         
         _data->assets.LoadTexture("Game Background", GAME_BACKGROUND_FILEPATH);
         _data->assets.LoadTexture("Game Background 2", GAME_BACKGROUND2_FILEPATH);
@@ -57,6 +63,9 @@ namespace Cosmic
         _score = 0;
         hud->UpdateScore(_score);
         
+        _ostSound.setLoop(true);
+        _ostSound.play();
+        
         _gameState = GameStates::eReady;
         
     }
@@ -72,8 +81,9 @@ namespace Cosmic
                 _data->window.close();
             }
             
-            if (_data->input.isSpriteClicked(_background, sf::Mouse::Left, _data->window)
-                || _data->input.isSpriteClicked(sf::Keyboard::Space))
+            if (_data->input.isSpriteClicked(_background, sf::Mouse::Left, _data->window))
+//                || _data->input.isSpriteClicked(sf::Keyboard::Space)
+//                || _data->input.isSpriteClicked(sf::Keyboard::Up))
             {
                 if (GameStates::eGameOver != _gameState)
                 {
@@ -98,17 +108,17 @@ namespace Cosmic
         {
             pipe->MovePipes(dt);
             
-            if (_clock.getElapsedTime().asSeconds() > PIPE_SPAWN_FREQUENCY)
+            if (_clock.getElapsedTime().asSeconds() > PIPE_SPAWN_FREQUENCY && _score < 99)
             {
                 pipe->RandomisePipeOffset();
                 
                 int rand1 = rand(), rand2 = rand();
                 
                 if (rand1 % 13) {
-                    pipe->SpawnBottomPipe();
+                    pipe->SpawnBottomPipe(_score);
                 }
-                if (rand2 % 13) {
-                    pipe->SpawnTopPipe();
+                if (rand2 % 7) {
+                    pipe->SpawnTopPipe(_score);
                 }
                 pipe->SpawnScoringPipe();
                 _clock.restart();
@@ -119,7 +129,7 @@ namespace Cosmic
             
             for (int i = 0; i < landSprites.size(); i++)
             {
-                if (collision.checkSpriteCollision(bird->GetSprite(), 0.7f, landSprites.at(i), 1.0f))
+                if (collision.checkSpriteCollisionForScore(bird->GetSprite(), 0.8f, landSprites.at(i), 1.0f))
                 {
                     _gameState = GameStates::eGameOver;
                     
@@ -139,7 +149,7 @@ namespace Cosmic
                     _clock.restart();
                 }
                 
-                if (collision.checkSpriteCollision(bird->GetSprite(), 0.625f, pipeSprites.at(i), 1.0f))
+                if (collision.checkSpriteCollision(bird->GetSprite(), 0.8f, pipeSprites.at(i), 1.0f))
                 {
                     _gameState = GameStates::eGameOver;
                     
@@ -155,7 +165,7 @@ namespace Cosmic
                 
                 for (int i = 0; i < scoringSprites.size(); i++)
                 {
-                    if (collision.checkSpriteCollision(bird->GetSprite(), 0.1f, scoringSprites.at(i), 1.0f))
+                    if (collision.checkSpriteCollisionForScore(bird->GetSprite(), 0.1f, scoringSprites.at(i), 1.0f))
                     {
                         _score++;
                         
@@ -176,6 +186,7 @@ namespace Cosmic
         if (GameStates::eGameOver == _gameState)
         {
             flash->Show(dt);
+            _ostSound.stop();
             
             if (_clock.getElapsedTime().asSeconds() > TIME_BEFORE_GAME_OVER_APPEARS)
             {

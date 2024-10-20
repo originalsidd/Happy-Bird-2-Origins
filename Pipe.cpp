@@ -10,20 +10,28 @@ namespace Cosmic
         _pipeSpawnYOffset = 0;
     }
 
-    void Pipe::SpawnBottomPipe()
+    void Pipe::SpawnBottomPipe(int score)
     {
         sf::Sprite sprite(_data->assets.GetTexture("Pipe Up"));
         
-        sprite.setPosition(_data->window.getSize().x, _data->window.getSize().y - sprite.getGlobalBounds().height - _pipeSpawnYOffset);
-        
-        pipeSprites.push_back(sprite);
+        Pipe::Spawn(sprite, _data->window.getSize().x, _data->window.getSize().y - sprite.getGlobalBounds().height - _pipeSpawnYOffset, score);
     }
 
-    void Pipe::SpawnTopPipe()
+    void Pipe::SpawnTopPipe(int score)
     {
         sf::Sprite sprite(_data->assets.GetTexture("Pipe Down"));
         
-        sprite.setPosition(_data->window.getSize().x, -_pipeSpawnYOffset);
+        Pipe::Spawn(sprite, _data->window.getSize().x, -_pipeSpawnYOffset, score);
+    }
+
+    void Pipe::Spawn(sf::Sprite sprite, float posX, float posY, int score)
+    {
+        sprite.setPosition(posX, posY);
+        
+        int randInt = rand();
+        int randIntSign = randInt%2 ==0 ? score : -score;
+        randIntSign = randIntSign / 10;
+        sprite.rotate(randIntSign);
         
         pipeSprites.push_back(sprite);
     }

@@ -11,8 +11,8 @@ namespace Cosmic
     public:
         Pipe(GameDataRef data);
         
-        void SpawnBottomPipe();
-        void SpawnTopPipe();
+        void SpawnBottomPipe(int sc);
+        void SpawnTopPipe(int sc);
         void SpawnScoringPipe();
         void MovePipes(float dt);
         void DrawPipes();
@@ -22,6 +22,7 @@ namespace Cosmic
         std::vector<sf::Sprite> &GetScoringSprites();
         
     private:
+        void Spawn(sf::Sprite sp, float posX, float posY, int sc);
         GameDataRef _data;
         std::vector<sf::Sprite> pipeSprites;
         std::vector<sf::Sprite> scoringPipes;
